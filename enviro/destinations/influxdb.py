@@ -3,24 +3,10 @@ from enviro.constants import UPLOAD_SUCCESS, UPLOAD_FAILED
 import urequests, time
 import config
 
-def url_encode(t):
-  result = ""
-  for c in t:
-    # no encoding needed for character
-    if c.isalpha() or c.isdigit() or c in ["-", "_", "."]:
-      result += c
-    elif c == " ":
-      result += "+"
-    else:
-      result += f"%{ord(c):02X}"
-  return result
-
 def log_destination():
-  logging.info(f"> uploading cached readings to Influxdb bucket: {config.influxdb_bucket}")
+  logging.info(f"> uploading cached readings to Influxdb ...")
 
-def upload_reading(reading):  
-  bucket = config.influxdb_bucket
-
+def upload_reading(reading):
   payload = ""
   for key, value in reading["readings"].items():
     if payload != "":
@@ -40,18 +26,18 @@ def upload_reading(reading):
 
   influxdb_token = config.influxdb_token
   headers = {
-    "Authorization": f"Token {influxdb_token}"
+    "Authorization": f"Bearer {influxdb_token}",
+    # "Content-Type": f"application/json"
   }
 
   url = config.influxdb_url
-  org = config.influxdb_org
-  url += f"/api/v2/write?precision=s&org={url_encode(org)}&bucket={url_encode(bucket)}"
- 
+  url += f"?precision=s"
+
   try:
     # post reading data to http endpoint
     result = urequests.post(url, headers=headers, data=payload)
     result.close()
-    
+
     if result.status_code == 204:  # why 204? we'll never know...
       return UPLOAD_SUCCESS
 
