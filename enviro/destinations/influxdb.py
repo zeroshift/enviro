@@ -1,5 +1,5 @@
 from enviro import logging
-from enviro.constants import UPLOAD_SUCCESS, UPLOAD_FAILED
+from enviro.constants import UPLOAD_SUCCESS, UPLOAD_FAILED, UPLOAD_SKIP_FILE
 import urequests, time
 import config
 
@@ -40,6 +40,8 @@ def upload_reading(reading):
 
     if result.status_code == 204:  # why 204? we'll never know...
       return UPLOAD_SUCCESS
+    elif result.status_code == 400:
+      return UPLOAD_SKIP_FILE
 
     logging.debug(f"  - upload issue ({result.status_code} {result.reason})")
   except:
