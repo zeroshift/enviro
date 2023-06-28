@@ -47,4 +47,5 @@ def upload_reading(reading):
   except:
     logging.debug(f"  - an exception occurred when uploading")
 
-  return UPLOAD_FAILED
+  # return UPLOAD_FAILED
+  return UPLOAD_SKIP_FILE
